@@ -1,12 +1,21 @@
 <template>
   <div class="pa-3">
     <div class="login-header">
-      <v-btn @click="handleExport" depressed color="primary">
-        <v-icon dark>
-          mdi-database-export
-        </v-icon>
-        Export Excel</v-btn
-      >
+      <div>
+        <v-btn @click="handleExport" depressed color="primary">
+          <v-icon dark>
+            mdi-database-export
+          </v-icon>
+          Export Excel</v-btn
+        >
+        <v-btn class="change-link" @click="handleChangeLink(1)" color="warning">
+          Change Ku Link</v-btn
+        >
+        <v-btn class="change-link" @click="handleChangeLink(2)" color="warning">
+          Change Zalo Link</v-btn
+        >
+      </div>
+
       <v-btn @click="handleLogout" depressed color="warning">
         <v-icon dark>
           mdi-logout
@@ -22,34 +31,43 @@
       class="elevation-1"
     >
       <template v-slot:top>
-      
-  
         <v-dialog v-model="dialogDelete" max-width="500px">
           <v-card>
-            <v-card-title class="headline">Bạn Chắc Chắn Xóa Dữ Liệu Này?</v-card-title>
+            <v-card-title class="headline"
+              >Bạn Chắc Chắn Xóa Dữ Liệu Này?</v-card-title
+            >
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn color="blue darken-1" text @click="closeDelete">Cancel</v-btn>
-              <v-btn color="blue darken-1" text @click="deleteItemConfirm">OK</v-btn>
+              <v-btn color="blue darken-1" text @click="closeDelete"
+                >Cancel</v-btn
+              >
+              <v-btn color="blue darken-1" text @click="deleteItemConfirm"
+                >OK</v-btn
+              >
               <v-spacer></v-spacer>
             </v-card-actions>
           </v-card>
         </v-dialog>
-    </template>
+      </template>
       <template v-slot:item.actions="{ item }">
-        <v-icon small @click="deleteItem (item)">
+        <v-icon small @click="deleteItem(item)">
           mdi-delete
         </v-icon>
       </template>
     </v-data-table>
+    <ChangeForm ref="ChangeForm" :type="linkType" />
   </div>
 </template>
 
 <script>
 import { mapGetters, mapActions } from "vuex";
 import { db } from "../firebase/db";
+import ChangeForm from "./ChangeForm";
 export default {
   name: "DataTable",
+  components: {
+    ChangeForm,
+  },
   data() {
     return {
       headers: [
@@ -64,7 +82,8 @@ export default {
       ],
       listItems: [],
       dialogDelete: false,
-      deleteData:{}
+      deleteData: {},
+      linkType: null,
     };
   },
   watch: {
@@ -81,7 +100,6 @@ export default {
   methods: {
     ...mapActions(["setCheckLogin"]),
     handleGetDataList() {
-      console.log("this.checkLogin", typeof this.checkLogin);
       if (this.checkLogin === "false") {
         this.$router.push({
           path: "/",
@@ -118,23 +136,31 @@ export default {
       });
     },
 
-    deleteItem (item) {
-      this.dialogDelete = true
-      this.deleteData=item
-   
+    deleteItem(item) {
+      this.dialogDelete = true;
+      this.deleteData = item;
     },
 
     deleteItemConfirm() {
-      db.collection('singUpList').doc(this.deleteData.id).delete()
-      this.deleteData={}
+      db.collection("singUpList")
+        .doc(this.deleteData.id)
+        .delete();
+      this.deleteData = {};
       this.closeDelete();
     },
-     closeDelete () {
-        this.dialogDelete = false
-      },
+    closeDelete() {
+      this.dialogDelete = false;
+    },
+    handleChangeLink(type) {
+      this.linkType = type;
+      this.$refs.ChangeForm.dialog = true;
+      
+    },
   },
   firestore: {
     listItems: db.collection("singUpList").orderBy("date", "desc"),
+    kuLink: db.collection("kuLink").orderBy("date", "desc"),
+    zaloLink: db.collection("zaloLink").orderBy("date", "desc"),
   },
 };
 </script>
@@ -144,5 +170,8 @@ export default {
   margin-bottom: 10px;
   display: flex;
   justify-content: space-between;
+}
+.change-link {
+  margin-left: 15px;
 }
 </style>

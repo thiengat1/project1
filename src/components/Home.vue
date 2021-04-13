@@ -43,7 +43,7 @@
 
 <script>
 import { db } from "../firebase/db";
-import {linkApi} from '@/js/link'
+//import {linkApi} from '@/js/link'
 export default {
   name: "Home",
   data() {
@@ -85,12 +85,12 @@ export default {
         phone: this.phone,
         date: this.handleGetDate(),
       });
-      window.location.href = linkApi.kuLink
+      window.location.href = this.kuLink[0].link;
       this.name = "";
       this.phone = "";
     },
     handleGetBonus() {
-      window.location.href = linkApi.zaloLink;
+      window.location.href = this.zaloLink[0].link;
     },
     handleGetDate() {
       var now = new Date();
@@ -111,6 +111,8 @@ export default {
   },
   firestore: {
     singUpList: db.collection("singUpList"),
+    kuLink: db.collection("kuLink").orderBy("date", "desc"),
+    zaloLink: db.collection("zaloLink").orderBy("date", "desc"),
   },
 };
 </script>

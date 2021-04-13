@@ -14,16 +14,21 @@
 </template>
 
 <script>
-import {linkApi} from '@/js/link'
+//import {linkApi} from '@/js/link'
+import { db } from "../firebase/db";
 export default {
   name: "Footer",
   methods: {
     handleLogin() {
-      window.location.href = linkApi.zaloLink;
+      window.location.href = this.zaloLink[0].link;
     },
     handleContact() {
-      window.location.href = linkApi.zaloLink;
+      window.location.href = this.zaloLink[0].link;
     },
+  },
+  firestore: {
+    kuLink: db.collection("kuLink").orderBy("date", "desc"),
+    zaloLink: db.collection("zaloLink").orderBy("date", "desc"),
   },
 };
 </script>
@@ -34,7 +39,7 @@ export default {
   cursor: pointer;
 }
 .btn-contact {
-   cursor: pointer;
+  cursor: pointer;
   color: #22acec;
 }
 </style>
